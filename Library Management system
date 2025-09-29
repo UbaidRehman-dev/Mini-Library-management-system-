@@ -1,0 +1,91 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+const int MAX = 100;
+int bookIDs[MAX];              // Dynamic array for Book IDs
+string titles[MAX], authors[MAX]; // Parallel arrays for Title and Author
+int deletedStack[MAX];         // Stack for deleted IDs
+int count = 0, top = -1;       // count = number of books, top = stack pointer
+
+int main() {
+    int choice, id;
+    while (true) {
+        cout << "\nLibrary Menu:\n";
+        cout << "1. Add Book\n2. Delete Book\n3. Undo Delete\n4. Search Book\n5. Display All Books\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+
+        if (choice == 1) {
+            cout << "Enter Book ID: ";
+            cin >> bookIDs[count];
+            cout << "Enter Title: ";
+            cin.ignore();
+            getline(cin, titles[count]);
+            cout << "Enter Author: ";
+            getline(cin, authors[count]);
+            count++;
+        }
+
+        else if (choice == 2) {
+            cout << "Enter Book ID to delete: ";
+            cin >> id;
+            bool found = false;
+            for (int i = 0; i < count; i++) {
+                if (bookIDs[i] == id) {
+                    deletedStack[++top] = id; // push to stack
+                    for (int j = i; j < count - 1; j++) {
+                        bookIDs[j] = bookIDs[j + 1];
+                        titles[j] = titles[j + 1];
+                        authors[j] = authors[j + 1];
+                    }
+                    count--;
+                    found = true;
+                    cout << "Book deleted.\n";
+                    break;
+                }
+            }
+            if (!found) cout << "Book not found.\n";
+        }
+
+        else if (choice == 3) {
+            if (top >= 0) {
+                bookIDs[count] = deletedStack[top--]; // pop from stack
+                titles[count] = "Restored Title";
+                authors[count] = "Restored Author";
+                count++;
+                cout << "Book restored.\n";
+            } else {
+                cout << "No book to restore.\n";
+            }
+        }
+
+        else if (choice == 4) {
+            cout << "Enter Book ID to search: ";
+            cin >> id;
+            bool found = false;
+            for (int i = 0; i < count; i++) {
+                if (*(bookIDs + i) == id) { // pointer used here
+                    cout << "Found: " << bookIDs[i] << ", " << titles[i] << ", " << authors[i] << "\n";
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) cout << "Book not found.\n";
+        }
+
+        else if (choice == 5) {
+            cout << "\nAll Books:\n";
+            cout << "ID\tTitle\tAuthor\n";
+            for (int i = 0; i < count; i++) {
+                cout << bookIDs[i] << "\t" << titles[i] << "\t" << authors[i] << "\n";
+            }
+        }
+
+        else {
+            cout << "Invalid choice.\n";
+        }
+    }
+
+    return 0;
+}
